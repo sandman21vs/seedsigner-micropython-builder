@@ -73,7 +73,9 @@ dist:
 	else \
 		echo "[dist] BAKE_LAUNCHER=0 -> firmware-only dist (no /main.py; boots to REPL)"; \
 	fi
-	@CHIP=$$(case "$(BOARD)" in *ESP32_P4*) echo esp32p4;; *) echo esp32s3;; esac); \
+	@# grep instead of `case` inside $(...): macOS /bin/sh (bash 3.2) can't parse the
+	@# unbalanced `)` of case patterns in a command substitution.
+	@CHIP=$$(echo "$(BOARD)" | grep -q ESP32_P4 && echo esp32p4 || echo esp32s3); \
 	echo ""; \
 	echo "Flash with:"; \
 	echo "  cd $(DIST_DIR) && python -m esptool --chip $$CHIP write_flash @flash_args"
