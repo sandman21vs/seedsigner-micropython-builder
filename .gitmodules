@@ -15,8 +15,8 @@
 	url = https://github.com/kdmukAI-bot/esp-secp256k1.git
 [submodule "deps/seedsigner"]
 	path = deps/seedsigner
-	url = https://github.com/kdmukAI-bot/seedsigner.git
-	branch = integration/lvgl-mpy
+	url = https://github.com/sandman21vs/seedsigner.git
+	branch = feat/nfc-card-storage
 [submodule "deps/embit"]
 	path = deps/embit
 	url = https://github.com/kdmukAI-bot/embit.git

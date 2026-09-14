@@ -32,6 +32,13 @@ package("urtypes", base_path="$(MPY_DIR)/../../../deps/third-party")
 # ships SHA-256. See deps/third-party/hashlib.py and bindings/modhashlibext.c.
 module("hashlib.py", base_path="$(MPY_DIR)/../../../deps/third-party")
 
+# ucryptolib.py / uhashlib_hw.py: MaixPy-style shims over the native `_aes_ext` module
+# (bindings/modaesext.c) so Krux's KEF envelope code runs unchanged in the app. This
+# firmware has no `cryptolib` (it needs MICROPY_PY_SSL, stripped with networking).
+# Used by NFC card storage (seed backups + descriptors on cards).
+module("ucryptolib.py", base_path="$(MPY_DIR)/../../../deps/third-party")
+module("uhashlib_hw.py", base_path="$(MPY_DIR)/../../../deps/third-party")
+
 # seedsigner_lvgl_screens.py: the public Python facade the shared app imports. It wraps
 # the private C module `_seedsigner_lvgl_screens`, does the microSD language-pack I/O the
 # C side can't (ESP-IDF fatfs vs MicroPython oofatfs link collision), and exposes the same

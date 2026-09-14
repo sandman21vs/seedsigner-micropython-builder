@@ -22,6 +22,13 @@ target_sources(usermod_dm INTERFACE
     # A frozen hashlib.py merges these into the extensible built-in `hashlib`. The
     # mbedtls math lives in __idf_esp-hashlib-ext (linked below).
     ${CMAKE_CURRENT_LIST_DIR}/modhashlibext.c
+    # AES ECB/CBC/CTR/GCM + PBKDF2-HMAC-SHA256 (module `_aes_ext`) for the KEF port.
+    # Frozen ucryptolib.py / uhashlib_hw.py shims wrap it. Crypto lives in
+    # __idf_esp-hashlib-ext (aes_ext.c).
+    ${CMAKE_CURRENT_LIST_DIR}/modaesext.c
+    # NFC card storage (module `nfc`): WS1850S reader on the board I2C bus. Calls the
+    # plain-C API of __idf_nfc (ports/esp32/nfc, ported from Kern).
+    ${CMAKE_CURRENT_LIST_DIR}/modnfc.c
 )
 
 target_include_directories(usermod_dm INTERFACE
@@ -39,6 +46,8 @@ target_include_directories(usermod_dm INTERFACE
     # hashlib-ext plain-C API only (modhashlibext.c does #include "hashlib_ext.h");
     # the mbedtls headers stay inside the __idf_esp-hashlib-ext component.
     ${CMAKE_CURRENT_LIST_DIR}/../deps/esp-hashlib-ext
+    # nfc component public API only (modnfc.c does #include "nfc.h").
+    ${CMAKE_CURRENT_LIST_DIR}/../ports/esp32/nfc/include
 )
 
 # Link bindings against ESP-IDF component libs instead of compiling component C++
@@ -55,6 +64,9 @@ target_link_libraries(usermod_dm INTERFACE
     # hashlib-ext: mbedtls-backed SHA-512 + PBKDF2 (plain-C lib; mbedtls stays
     # inside this component, out of the usermod QSTR-scan — same split as cUR/secp).
     __idf_esp-hashlib-ext
+    # NFC card storage driver (WS1850S), pulled into the build via display_manager's
+    # REQUIRES.
+    __idf_nfc
 )
 
 target_link_libraries(usermod INTERFACE usermod_dm)

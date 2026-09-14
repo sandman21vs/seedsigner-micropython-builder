@@ -8,6 +8,10 @@ list(APPEND component_requires
     "lvgl"
     "seedsigner"
     "esp_hw_support"   # esp_ldo_regulator.h — power the P4 SD card VDD rail
+    # NFC card storage driver (ports/esp32/nfc). Nothing here calls it; requiring it
+    # pulls the component into the IDF build so the `nfc` MicroPython binding can
+    # link __idf_nfc without touching the MicroPython patch's IDF_COMPONENTS list.
+    "nfc"
 )
 
 idf_component_register(
