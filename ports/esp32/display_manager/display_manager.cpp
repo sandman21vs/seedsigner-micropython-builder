@@ -165,8 +165,32 @@ extern "C" void init(void)
  */
 extern "C" void boardctrl_startup(void);  /* original NVS/flash init */
 
+#ifdef BOARD_RADIO_COPROC_RESET_PIN
+/* Air gap: hold the radio co-processor (ESP32-C6 on the P4 "WIFI6" boards) in
+ * reset before anything else runs. The output latch defaults to 0, so enabling
+ * the driver already pulls CHIP_EN low against the external pull-up; the pad
+ * hold then latches it so CHIP_EN stays low through soft/WDT/panic resets —
+ * only a power-on reset releases it. board_init() re-asserts the same pin
+ * later; that is a no-op while the hold is active. */
+static void radio_coproc_hold_in_reset(void)
+{
+    const gpio_config_t en_cfg = {
+        .pin_bit_mask = 1ULL << BOARD_RADIO_COPROC_RESET_PIN,
+        .mode = GPIO_MODE_OUTPUT,
+    };
+    gpio_config(&en_cfg);
+    gpio_set_level(BOARD_RADIO_COPROC_RESET_PIN, 0);
+    gpio_hold_en(BOARD_RADIO_COPROC_RESET_PIN);
+    ESP_LOGI(TAG, "Radio co-processor held in reset + latched (GPIO%d low)",
+             (int)BOARD_RADIO_COPROC_RESET_PIN);
+}
+#else
+static void radio_coproc_hold_in_reset(void) {}
+#endif
+
 extern "C" void seedsigner_board_startup(void)
 {
+    radio_coproc_hold_in_reset();
     boardctrl_startup();
     init();
 
